@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CC Checker — Matrix Terminal</title>
+  <style>
+    body { background: #000; color: #0f0; font-family: monospace; margin:0; padding:0 }
+    .terminal { padding: 20px; min-height: 100vh }
+    .input { margin-top: 20px }
+    .card { background: rgba(0,0,0,0.6); padding:16px; border-radius:8px; display:inline-block }
+    .btn { background:#0f0; color:#000; border:none; padding:8px 12px; cursor:pointer }
+    .result { margin-top:12px }
+    @media (max-width:600px){ body{font-size:14px} }
+  </style>
+</head>
+<body>
+  <div class="terminal">
+    <h1>Matrix Card Checker Terminal</h1>
+    <div class="card">
+      <div>
+        <label>Card number:</label>
+        <input id="card" type="text" placeholder="4242424242424242" />
+      </div>
+      <div class="input">
+        <button id="check" class="btn">Validate</button>
+      </div>
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('check').addEventListener('click', async () => {
+      const card = document.getElementById('card').value;
+      const resEl = document.getElementById('result');
+      resEl.textContent = 'Checking...';
+      try {
+        const r = await fetch('/api/validate/card', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ card_number: card }) });
+        const j = await r.json();
+        if (!j.success) { resEl.textContent = 'Error: ' + (j.message || 'unknown'); return }
+        const d = j.data;
+        resEl.innerHTML = `<div>Valid: ${d.valid}</div><div>Brand: ${d.bin.brand}</div><div>Country: ${d.bin.country}</div><div>Risk Score: ${d.riskScore}</div><div>Masked: ${d.masked}</div>`;
+      } catch (e) { resEl.textContent = 'Network error' }
+    });
+  </script>
+</body>
+</html>

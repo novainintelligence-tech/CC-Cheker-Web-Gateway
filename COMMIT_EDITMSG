@@ -1,0 +1,10 @@
+chore(features): add migrations, card validation, admin endpoints, public UI (matrix & admin), and telegram skeleton
+
+Implemented:
+- migrations/001_init.sql and migration runner
+- /api/validate/card real-time validation (Luhn, BIN lookup, risk scoring)
+- analytics_events recording
+- /api/admin endpoints for stats and gateway management
+- public/index.html (matrix-style terminal UI) and public/admin.html
+- Telegram integration skeleton
+- updated server to serve public/ files
