@@ -14,7 +14,6 @@ router.post('/flutterwave/init', async (req, res) => {
     const tx_ref = `ccg_${Date.now()}`;
     const r = await initPayment({ amount, currency, customer, tx_ref });
 
-    // If flutterwave returned a link, store a pending payment
     const link = r?.data?.link || r?.data?.meta?.authorization?.redirect || r?.data?.authorization_url || r?.data?.link;
 
     await query('INSERT INTO payments (tx_ref, gateway, amount, currency, status, metadata) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (tx_ref) DO NOTHING', [tx_ref, 'flutterwave', amount, currency, 'pending', r]);
@@ -30,9 +29,10 @@ router.post('/flutterwave/init', async (req, res) => {
 router.post('/flutterwave/webhook', async (req, res) => {
   try {
     const event = req.body;
-    console.log('Received Flutterwave webhook (truncated):', event && event.event ? event.event : 'no event type');
+    const signature = (req.headers['verif-hash'] || req.headers['verif-signature'] || req.headers['x-flw-signature']) as string | undefined;
+    console.log('Received Flutterwave webhook (event type):', event && event.event ? event.event : 'no event type');
 
-    const h = await handleWebhook(event);
+    const h = await handleWebhook(event, signature);
     if (h.ok) return res.status(200).send('OK');
     return res.status(400).send('IGNORED');
   } catch (err) {

@@ -12,13 +12,16 @@ import validateRouter from './routes/validate';
 import adminRouter from './routes/admin';
 import bulkRouter from './routes/bulk';
 import telegramRouter from './routes/telegram';
+import adminAuthRouter from './routes/admin_auth';
+import paymentsAdminRouter from './routes/payments_admin';
 import path from 'path';
 
 const app = express();
 
 app.use(helmet());
 app.use(cors());
-app.use(bodyParser.json({ limit: '1mb' }));
+// capture rawBody for webhook signature verification
+app.use(bodyParser.json({ limit: '1mb', verify: (req: any, res, buf) => { req.rawBody = buf; } }));
 app.use(morgan('dev'));
 
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
@@ -32,6 +35,8 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api/gateways', gatewaysRouter);
 app.use('/api/validate', validateRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/admin', paymentsAdminRouter);
+app.use('/api/admin/auth', adminAuthRouter);
 app.use('/api/bulk', bulkRouter);
 app.use('/api/telegram', telegramRouter);
 
