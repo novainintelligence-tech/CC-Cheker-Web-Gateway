@@ -1,10 +1,14 @@
-chore(features): add migrations, card validation, admin endpoints, public UI (matrix & admin), and telegram skeleton
+# Added Flutterwave integration, gateway seed script, bulk processing endpoints, and telegram webhook handler
 
-Implemented:
-- migrations/001_init.sql and migration runner
-- /api/validate/card real-time validation (Luhn, BIN lookup, risk scoring)
-- analytics_events recording
-- /api/admin endpoints for stats and gateway management
-- public/index.html (matrix-style terminal UI) and public/admin.html
-- Telegram integration skeleton
-- updated server to serve public/ files
+This commit adds the following:
+- src/services/flutterwave.ts: sandbox-aware Flutterwave init and verify helpers
+- Updated payments route to call real Flutterwave API when keys are configured and persist payments
+- src/db/seed_gateways.ts: script to seed many gateways into the DB
+- src/routes/bulk.ts: bulk job creation and status endpoints (simple worker simulation)
+- src/routes/telegram.ts: basic Telegram webhook handler using integrations/telegram helper
+- Added express-rate-limit and node-fetch to package.json
+- Updated server index to register new routes and rate limiter
+
+Next steps:
+- Run migrations (npm run migrate) and then seed gateways (npm run seed:gateways)
+- Provide sandbox FLW keys and Telegram token in .env (or test in simulated mode)

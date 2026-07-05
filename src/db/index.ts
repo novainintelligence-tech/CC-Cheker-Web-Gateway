@@ -3,6 +3,7 @@ import { config } from '../config';
 
 const pool = new Pool({
   connectionString: config.databaseUrl,
+  max: 10
 });
 
 export async function query(text: string, params?: any[]) {
